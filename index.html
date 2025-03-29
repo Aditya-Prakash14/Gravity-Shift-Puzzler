@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity Shift Puzzler</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>Gravity Shift Puzzler</h1>
+            <div class="game-options">
+                <button id="sound-toggle" class="option-btn" aria-label="Toggle sound">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <button id="settings-btn" class="option-btn" aria-label="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </header>
+        
+        <div class="game-info">
+            <div class="level-info">Level: <span id="level-number">1</span></div>
+            <div class="moves-info">Moves: <span id="moves-count">0</span>/<span id="moves-limit">10</span></div>
+            <div class="timer">Time: <span id="timer-display">00:00</span></div>
+        </div>
+        
+        <div class="game-board" id="game-board"></div>
+        
+        <div class="controls">
+            <div class="controls-row">
+                <button id="up-btn" class="control-btn"><i class="fas fa-arrow-up"></i></button>
+            </div>
+            <div class="controls-row">
+                <button id="left-btn" class="control-btn"><i class="fas fa-arrow-left"></i></button>
+                <button id="right-btn" class="control-btn"><i class="fas fa-arrow-right"></i></button>
+            </div>
+            <div class="controls-row">
+                <button id="down-btn" class="control-btn"><i class="fas fa-arrow-down"></i></button>
+            </div>
+            <div class="movement-toggle">
+                <button id="movement-mode-btn" class="toggle-btn">
+                    <span class="mode-indicator full active">Full</span>
+                    <span class="mode-indicator step">Step</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="message-area" id="message-area"></div>
+        
+        <div class="game-actions">
+            <button id="restart-btn" class="action-btn"><i class="fas fa-redo"></i> Restart</button>
+            <button id="next-level-btn" class="action-btn" disabled><i class="fas fa-forward"></i> Next Level</button>
+            <button id="level-select-btn" class="action-btn"><i class="fas fa-list"></i> Level Select</button>
+        </div>
+        
+        <div class="instructions">
+            <h3>How to Play:</h3>
+            <p>Use the arrow buttons or keyboard arrows to change gravity and guide the ball to the target!</p>
+            <p>Toggle between <strong>Full</strong> (ball moves until obstacle) and <strong>Step</strong> (ball moves one tile) modes.</p>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-icon ball-icon"></div><span>Ball</span></div>
+                <div class="legend-item"><div class="legend-icon target-icon"></div><span>Target</span></div>
+                <div class="legend-item"><div class="legend-icon wall-icon"></div><span>Wall</span></div>
+                <div class="legend-item"><div class="legend-icon movable-icon"></div><span>Movable Block</span></div>
+                <div class="legend-item"><div class="legend-icon one-way-icon">↑</div><span>One-Way Tiles</span></div>
+                <div class="legend-item"><div class="legend-icon portal-icon"></div><span>Portals</span></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Dialogs -->
+    <div class="modal" id="level-select-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Select Level</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="level-grid"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-row">
+                    <label for="animation-speed">Animation Speed:</label>
+                    <input type="range" id="animation-speed" min="1" max="10" value="5">
+                </div>
+                <div class="setting-row">
+                    <label for="theme-select">Theme:</label>
+                    <select id="theme-select">
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                        <option value="neon">Neon</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label for="sound-volume">Sound Volume:</label>
+                    <input type="range" id="sound-volume" min="0" max="100" value="70">
+                </div>
+                <div class="setting-row">
+                    <label for="default-movement">Default Movement Mode:</label>
+                    <select id="default-movement">
+                        <option value="full">Full (until obstacle)</option>
+                        <option value="step">Step (one tile)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="win-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Level Complete!</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="stats-row">
+                    <p>Moves: <span id="win-moves">0</span>/<span id="win-move-limit">10</span></p>
+                    <p>Time: <span id="win-time">00:00</span></p>
+                    <p>Stars: <span id="win-stars">★★★</span></p>
+                </div>
+                <div class="modal-actions">
+                    <button id="win-restart" class="action-btn"><i class="fas fa-redo"></i> Restart</button>
+                    <button id="win-next" class="action-btn"><i class="fas fa-forward"></i> Next Level</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Particle Container for Effects -->
+    <div id="particles-container"></div>
+
+    <!-- Audio Files -->
+    <audio id="move-sound" src="sounds/move.mp3" preload="auto"></audio>
+    <audio id="block-sound" src="sounds/block.mp3" preload="auto"></audio>
+    <audio id="portal-sound" src="sounds/portal.mp3" preload="auto"></audio>
+    <audio id="win-sound" src="sounds/win.mp3" preload="auto"></audio>
+    <audio id="fail-sound" src="sounds/fail.mp3" preload="auto"></audio>
+    <audio id="background-music" src="sounds/background.mp3" loop preload="auto"></audio>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
